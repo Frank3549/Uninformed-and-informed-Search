@@ -15,9 +15,9 @@ from typing import Callable, List, Optional, Sequence, Tuple
 # You are welcome to add constants, but do not modify the pre-existing constants
 
 # Problem size 
-BOARD_SIZE = 3
+BOARD_SIZE = 10
 TOP_RANGE = list(range(1, BOARD_SIZE - 1))
-BOTTOM_RANGE = list(range(BOARD_SIZE**2 - BOARD_SIZE, BOARD_SIZE**2 - 1))
+BOTTOM_RANGE = list(range(BOARD_SIZE**2 - BOARD_SIZE + 1, BOARD_SIZE**2 - 1))
 LEFT_RANGE = list(range(BOARD_SIZE, BOARD_SIZE**2 - BOARD_SIZE, BOARD_SIZE))
 RIGHT_RANGE = list(range(2*BOARD_SIZE - 1, BOARD_SIZE**2 - 1, BOARD_SIZE))
 
@@ -65,12 +65,7 @@ class Node:
             2. If the blank is on the edge of the board, it can move in 3 directions
             3. If the blank is in the corner of the board, it can move in 2 directions
         
-        We know there are only 4 corners in any sized board, so we can check the following positions:
-            1. Top left corner: position [0]
-            2. Top right corner: position [BOARD_SIZE - 1]
-            3. Bottom left corner: position [(BOARD_SIZE - 1) * BOARD_SIZE] or [BOARD_SIZE**2 - BOARD_SIZE]
-            4. Bottom right corner: position [BOARD_SIZE**2 - 1]
-        
+
         We can then check the following positions to see if the blank is on the edge of the board:
             1. Top edge: positions [1, 2, ..., BOARD_SIZE - 2] 
             2. Bottom edge: positions [BOARD_SIZE**2 - BOARD_SIZE + 1, ..., BOARD_SIZE**2 - 2]
@@ -202,6 +197,14 @@ class Node:
 
     def __str__(self):
         return str(self.state)
+    
+    def print_board(self):
+        """
+        Print the board as a 2D array
+        """
+
+        for i in range(0, BOARD_SIZE**2, BOARD_SIZE):
+            print(self.state[i:i + BOARD_SIZE])
 
     # The following methods enable Node to be used in types that use hashing (sets, dictionaries) or perform comparisons. Note
     # that the comparisons are performed exclusively on the state and ignore parent and cost values.
@@ -233,7 +236,7 @@ def bfs(initial_board: Sequence[int], max_depth=12) -> Tuple[Optional[Node], int
 def is_edge_blank(blank_index: int) -> Tuple[bool, str]:
     """
     Check if blank is on the edge of the board.
-    If so return True and either "top", "bottom", "left", or "right" depending on the edge.
+    If so return True and either "top", "bottom", "left", or "right" depending on the edge. 
     
     Args: 
         blank_index (int): Index of the blank space in the board
