@@ -16,6 +16,10 @@ from typing import Callable, List, Optional, Sequence, Tuple
 
 # Problem size 
 BOARD_SIZE = 3
+TOP_RANGE = list(range(1, BOARD_SIZE - 1))
+BOTTOM_RANGE = list(range(BOARD_SIZE**2 - BOARD_SIZE, BOARD_SIZE**2 - 1))
+LEFT_RANGE = list(range(BOARD_SIZE, BOARD_SIZE**2 - BOARD_SIZE, BOARD_SIZE))
+RIGHT_RANGE = list(range(2*BOARD_SIZE - 1, BOARD_SIZE**2 - 1, BOARD_SIZE))
 
 # The goal is a "blank" (0) in bottom right corner
 GOAL = tuple(range(1, BOARD_SIZE**2)) + (0,)
@@ -65,7 +69,7 @@ class Node:
             1. Top left corner: position [0]
             2. Top right corner: position [BOARD_SIZE - 1]
             3. Bottom left corner: position [(BOARD_SIZE - 1) * BOARD_SIZE] or [BOARD_SIZE**2 - BOARD_SIZE]
-            4. Bottom right corner: position [Board_SIZE**2 - 1]
+            4. Bottom right corner: position [BOARD_SIZE**2 - 1]
         
         We can then check the following positions to see if the blank is on the edge of the board:
             1. Top edge: positions [1, 2, ..., BOARD_SIZE - 2] 
@@ -138,8 +142,57 @@ def bfs(initial_board: Sequence[int], max_depth=12) -> Tuple[Optional[Node], int
     Returns:
         Tuple[Optional[Node], int]: Tuple of solution Node (or None if no solution found) and number of unique nodes explored
     """
+
     # TODO: Implement BFS. Your function should return a tuple containing the solution node and number of unique node explored
     return None, 0
+
+def isEdgeNode(blank_index: int) -> Tuple[bool, str]:
+    """
+    Check if node on the edge of the board.
+    If so return True and either "top", "bottom", "left", or "right" depending on the edge.
+    
+    Args: 
+        blank_index (int): Index of the blank space in the board
+
+    Returns:
+        Tuple[bool, str]: Tuple of boolean value and string
+    """
+    
+    if blank_index in TOP_RANGE:
+        return True, "top"
+    elif blank_index in BOTTOM_RANGE:
+        return True, "bottom"
+    elif blank_index in LEFT_RANGE:
+        return True, "left"
+    elif blank_index in RIGHT_RANGE:
+        return True, "right"
+    else:
+        return False, ""
+
+def isCornerNode(blank_index: int) -> Tuple[bool, str]:
+    """
+    Check if node on the corner of the board.
+    If so return True and either "top-left", "top-right", "bottom-left", or "bottom-right" depending on the corner.
+    
+    Args: 
+        blank_index (int): Index of the blank space in the board
+
+    Returns:
+        Tuple[bool, str]: Tuple of boolean value and string
+    """
+    
+
+    if blank_index == 0:
+        return True, "top-left"
+    elif blank_index == BOARD_SIZE - 1:
+        return True, "top-right"
+    elif blank_index == BOARD_SIZE**2 - BOARD_SIZE:
+        return True, "bottom-left"
+    elif blank_index == BOARD_SIZE**2 - 1:
+        return True, "bottom-right"
+    else:
+        return False, ""
+
 
 
 
