@@ -89,7 +89,7 @@ class Node:
 
 
         if is_corner:
-            return self.corner_blank_states(what_corner)
+            return self.corner_blank_states(what_corner, row, col)
         elif is_edge:
             return self.edge_blank_states(what_edge, row, col)
         else:
@@ -105,39 +105,40 @@ class Node:
         )
         return state
 
-    def corner_blank_states(self, position_of_blank: str ) -> List["Node"]:
+    def corner_blank_states(self, position_of_blank: str, row: int, col: int) -> List["Node"]:
         """
         Move the blank space in a corner node.
         If the blank space is in the corner, return the possible moves the blank space can make.
         
         Args: 
             what_corner (str): The corner the blank space is in
+            row (int): The row the blank space is in
+            col (int): The column the blank space is in
 
         Returns:
             List["Node"]: List of possible moves the blank space can make
         """
-        children = []
+            
         if position_of_blank == "top-left":
-            children = [
-                Node(self._swap(0, 0, 0, 1), self, self.cost + 1), # Move blank to the right
-                Node(self._swap(0, 0, 1, 0), self, self.cost + 1) # Move blank down
+            return [
+                Node(self._swap(row, col, row, col + 1), self, self.cost + 1), # Move blank to the right
+                Node(self._swap(row, col, row + 1, col), self, self.cost + 1) # Move blank down
             ]
         elif position_of_blank == "top-right":
-            children = [
-                Node(self._swap(0, BOARD_SIZE - 1, 0, BOARD_SIZE - 2), self, self.cost + 1), # Move blank to the left
-                Node(self._swap(0, BOARD_SIZE - 1, 1, BOARD_SIZE - 1), self, self.cost + 1) # Move blank down
+            return [
+                Node(self._swap(row, col, row, col - 1), self, self.cost + 1), # Move blank to the left
+                Node(self._swap(row, col, row + 1, col), self, self.cost + 1) # Move blank down
             ]
         elif position_of_blank == "bottom-left":
-            children = [
-                Node(self._swap(BOARD_SIZE - 1, 0, BOARD_SIZE - 1, 1), self, self.cost + 1), # Move blank to the right
-                Node(self._swap(BOARD_SIZE - 1, 0, BOARD_SIZE - 2, 0), self, self.cost + 1) # Move blank up
+            return [
+                Node(self._swap(row, col, row, col + 1), self, self.cost + 1), # Move blank to the right
+                Node(self._swap(row, col, row - 1, col), self, self.cost + 1) # Move blank up
             ]
         elif position_of_blank == "bottom-right":
-            children = [
-                Node(self._swap(BOARD_SIZE - 1, BOARD_SIZE - 1, BOARD_SIZE - 1, BOARD_SIZE - 2), self, self.cost + 1), # Move blank to the left
-                Node(self._swap(BOARD_SIZE - 1, BOARD_SIZE - 1, BOARD_SIZE - 2, BOARD_SIZE - 1), self, self.cost + 1) # Move blank up
+            return [
+                Node(self._swap(row, col, row, col - 1), self, self.cost + 1), # Move blank to the left
+                Node(self._swap(row, col, row - 1, col), self, self.cost + 1) # Move blank up
             ]
-        return children
     
     def edge_blank_states(self, position_of_blank: str, row: int, col: int) -> List["Node"]:
         """
