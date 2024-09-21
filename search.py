@@ -9,13 +9,13 @@ TODO Briefly describe your heuristic and why it is more efficient
 """
 
 import argparse, itertools, random, sys
-from typing import Callable, List, Optional, Sequence, Tuple
+from typing import Callable, List, Optional, Sequence, Tuple, Set
 
 
 # You are welcome to add constants, but do not modify the pre-existing constants
 
 # Problem size 
-BOARD_SIZE = 10
+BOARD_SIZE = 3
 TOP_RANGE = list(range(1, BOARD_SIZE - 1))
 BOTTOM_RANGE = list(range(BOARD_SIZE**2 - BOARD_SIZE + 1, BOARD_SIZE**2 - 1))
 LEFT_RANGE = list(range(BOARD_SIZE, BOARD_SIZE**2 - BOARD_SIZE, BOARD_SIZE))
@@ -82,12 +82,20 @@ class Node:
         row = index_of_blank // BOARD_SIZE
         col = index_of_blank % BOARD_SIZE
 
+        print("")
+        print("Row: %d, Col: %d is where the blank space is at" % (row, col))
+        print("What the board looks like now")
+        self.print_board()
+        print("")
 
         if is_corner:
+            print("%s is the corner thats blank." % what_corner)
             return self.corner_blank_states(what_corner, row, col)
         elif is_edge:
+            print("%s is the edge thats blank." % what_edge)
             return self.edge_blank_states(what_edge, row, col)
         else:
+            print("Middle is blank")           
             return self.middle_blank_states(row, col)
         
 
@@ -230,8 +238,44 @@ def bfs(initial_board: Sequence[int], max_depth=12) -> Tuple[Optional[Node], int
         Tuple[Optional[Node], int]: Tuple of solution Node (or None if no solution found) and number of unique nodes explored
     """
 
-    # TODO: Implement BFS. Your function should return a tuple containing the solution node and number of unique node explored
+    initial_board = Node(initial_board)
+    current_depth = 0 #initial Node being at depth 0.
+    unique_nodes_reached = 0 #does not include the initial_state
+    visited: Set[Tuple[int, ...]] = set()
+    queue: List["Node"] = []
+    
+    print("Initial Board is the goal? ", initial_board.is_goal())
+    if initial_board.is_goal():
+        print("Solution Found with %d moves" % initial_board.cost)
+        return initial_board, unique_nodes_reached
+    else: 
+        for move in initial_board.expand():
+            queue.append(move)
+        current_depth += 1
+
+
+    while current_depth <= max_depth and queue:
+        current_node = queue.pop(0)
+        visited.add(current_node.state)
+        unique_nodes_reached += 1
+        if current_node.is_goal():
+            print("Solution Found with %d unique nodes reached and %d moves" % (unique_nodes_reached, current_node.cost))
+            return current_node, unique_nodes_reached
+
+        else:
+            print("Current Node which was not the solution ", current_node.print_board())
+            next_moves = current_node.expand()
+            for move in next_moves:
+                if move.state not in visited:
+                    queue.append(move)
+                    print("length of queue: %d" % len(queue))
+            current_depth += 1
+
+            
+
+
     return None, 0
+
 
 def is_edge_blank(blank_index: int) -> Tuple[bool, str]:
     """
@@ -396,3 +440,5 @@ if __name__ == "__main__":
         )
     else:
         print("Iterations:", args.iter, "Solutions: 0")
+
+
