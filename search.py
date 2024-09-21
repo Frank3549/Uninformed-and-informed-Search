@@ -82,20 +82,33 @@ class Node:
         row = index_of_blank // BOARD_SIZE
         col = index_of_blank % BOARD_SIZE
 
-        print("")
-        print("Row: %d, Col: %d is where the blank space is at" % (row, col))
-        print("What the board looks like now")
+        print("Board we're expanding:")
         self.print_board()
-        print("")
+        print("\n");
 
         if is_corner:
-            print("%s is the corner thats blank." % what_corner)
+            print("%s corner has blank space" % what_corner)
+            print("From our current board state, we can move the blank space to the following positions:")
+            for move in self.corner_blank_states(what_corner, row, col):
+                move.print_board()
+                print("")                
+            print('end of possible moves')
             return self.corner_blank_states(what_corner, row, col)
         elif is_edge:
-            print("%s is the edge thats blank." % what_edge)
+            print("%s edge has blank space" % what_edge)
+            print("From our current board state, we can move the blank space to the following positions:")
+            for move in self.edge_blank_states(what_edge, row, col):
+                move.print_board()
+                print("")
+            print('end of possible moves')            
             return self.edge_blank_states(what_edge, row, col)
         else:
-            print("Middle is blank")           
+            print("middle has blank space")
+            print("From our current board state, we can move the blank space to the following positions:")
+            for move in self.middle_blank_states(row, col):
+                move.print_board()
+                print("")
+            print('end of possible moves')   
             return self.middle_blank_states(row, col)
         
 
@@ -239,37 +252,37 @@ def bfs(initial_board: Sequence[int], max_depth=12) -> Tuple[Optional[Node], int
     """
 
     initial_board = Node(initial_board)
-    current_depth = 0 #initial Node being at depth 0.
     unique_nodes_reached = 0 #does not include the initial_state
-    visited: Set[Tuple[int, ...]] = set()
+    considered_states: Set[Tuple[int, ...]] = set()
     queue: List["Node"] = []
+    current_depth = 0
     
-    print("Initial Board is the goal? ", initial_board.is_goal())
     if initial_board.is_goal():
-        print("Solution Found with %d moves" % initial_board.cost)
         return initial_board, unique_nodes_reached
     else: 
+        considered_states.add(initial_board.state)
         for move in initial_board.expand():
             queue.append(move)
         current_depth += 1
 
 
-    while current_depth <= max_depth and queue:
+    while queue:
         current_node = queue.pop(0)
-        visited.add(current_node.state)
         unique_nodes_reached += 1
-        if current_node.is_goal():
-            print("Solution Found with %d unique nodes reached and %d moves" % (unique_nodes_reached, current_node.cost))
-            return current_node, unique_nodes_reached
 
+        if current_node.cost > max_depth:
+            return None, unique_nodes_reached
+    
+        elif current_node.is_goal():
+            return current_node, unique_nodes_reached
+        
         else:
-            print("Current Node which was not the solution ", current_node.print_board())
             next_moves = current_node.expand()
             for move in next_moves:
-                if move.state not in visited:
+                if move.state not in considered_states:
                     queue.append(move)
-                    print("length of queue: %d" % len(queue))
-            current_depth += 1
+                    considered_states.add(move.state)
+            
 
             
 
