@@ -82,33 +82,11 @@ class Node:
         row = index_of_blank // BOARD_SIZE
         col = index_of_blank % BOARD_SIZE
 
-        print("Board we're expanding:")
-        self.print_board()
-        print("\n");
-
         if is_corner:
-            print("%s corner has blank space" % what_corner)
-            print("From our current board state, we can move the blank space to the following positions:")
-            for move in self.corner_blank_states(what_corner, row, col):
-                move.print_board()
-                print("")                
-            print('end of possible moves')
             return self.corner_blank_states(what_corner, row, col)
-        elif is_edge:
-            print("%s edge has blank space" % what_edge)
-            print("From our current board state, we can move the blank space to the following positions:")
-            for move in self.edge_blank_states(what_edge, row, col):
-                move.print_board()
-                print("")
-            print('end of possible moves')            
+        elif is_edge:         
             return self.edge_blank_states(what_edge, row, col)
-        else:
-            print("middle has blank space")
-            print("From our current board state, we can move the blank space to the following positions:")
-            for move in self.middle_blank_states(row, col):
-                move.print_board()
-                print("")
-            print('end of possible moves')   
+        else:  
             return self.middle_blank_states(row, col)
         
 
