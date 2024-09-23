@@ -85,7 +85,7 @@ class Node:
         if is_corner:
             return self.corner_blank_states(what_corner, row, col)
         elif is_edge:         
-            return self.edge_blank_states(what_edge, row, col)
+            return self.edge_blank_states(what_edge, row, col) #2x2 boards will naturally never get here or below.
         else:  
             return self.middle_blank_states(row, col)
         
@@ -235,7 +235,7 @@ def bfs(initial_board: Sequence[int], max_depth=12) -> Tuple[Optional[Node], int
     queue: List["Node"] = []
     current_depth = 0
     
-    if initial_board.is_goal():
+    if initial_board.is_goal() or BOARD_SIZE <= 1:
         return initial_board, unique_nodes_reached
     else: 
         considered_states.add(initial_board.state)
@@ -280,6 +280,10 @@ def is_edge_blank(blank_index: int) -> Tuple[bool, str]:
         Tuple[bool, str]: Tuple of boolean value and string
     """
     
+
+    if(BOARD_SIZE <= 2):
+        return False, ""
+
     if blank_index in TOP_RANGE:
         return True, "top"
     elif blank_index in BOTTOM_RANGE:
@@ -301,8 +305,7 @@ def is_corner_blank(blank_index: int) -> Tuple[bool, str]:
 
     Returns:
         Tuple[bool, str]: Tuple of boolean value and string
-    """
-    
+    """        
 
     if blank_index == 0:
         return True, "top-left"
@@ -315,15 +318,33 @@ def is_corner_blank(blank_index: int) -> Tuple[bool, str]:
     else:
         return False, ""
 
-
-
-
-
 def manhattan_distance(node: Node) -> int:
-    """Compute manhattan distance f(node), i.e., g(node) + h(node)"""
-    # TODO: Implement the Manhattan distance heuristic (sum of Manhattan distances to goal location)
+    """
+    Compute manhattan distance f(node), i.e., g(node) + h(node)
+    where g(node) is the cost to reach the current node and h(node) is the heuristic value aka cost to reach the goal from the current node
 
+    Args:
+        node (Node): The current node
+    
+    Returns:
+        int: The manhattan distance "f(n)" of the current node
+    
+    """
+    
 
+    number_of_previous_moves = node.cost
+    straight_line_distance = 0
+
+    for square in range(0, BOARD_SIZE**2):
+        if node.state[square] != GOAL[square] and node.state[square] != 0: #dont count the straight line distance of the blank space
+            row = square // BOARD_SIZE
+            col = square % BOARD_SIZE
+            goal_row = GOAL.index(node.state[square]) // BOARD_SIZE
+            goal_col = GOAL.index(node.state[square]) % BOARD_SIZE
+            straight_line_distance += abs(row - goal_row) + abs(col - goal_col)
+
+    print("previous moves: %d, straight line distance to correct board: %s" % (number_of_previous_moves, straight_line_distance))
+    return number_of_previous_moves + straight_line_distance
 
 def custom_heuristic(node: Node) -> int:
     # TODO: Implement and document your _admissable_ heuristic function
@@ -431,5 +452,27 @@ if __name__ == "__main__":
         )
     else:
         print("Iterations:", args.iter, "Solutions: 0")
+
+board1 = Node([1, 2, 3, 4, 5, 6, 7, 8, 0])
+board2 = Node([1, 2, 3, 4, 5, 6, 7, 0, 8])
+board3 = Node([1, 2, 3, 4, 5, 6, 7, 8, 0])
+board4 = Node([1, 8, 3, 7, 5, 6, 4, 2, 0])
+
+# Test cases
+print("board1:")
+board1.print_board()
+print("manhattan distance for board1: %d" % manhattan_distance(board1)) # 0
+print("")
+print("board2:")
+board2.print_board()
+print("manhattan distance for board2: %d" % manhattan_distance(board2)) # 1
+print("")
+print("board3:")
+board3.print_board()
+print("manhattan distance for board3: %d" % manhattan_distance(board3)) # 4
+print("")
+print("board4:")
+board4.print_board()
+print("manhattan distance for board4: %d" % manhattan_distance(board4)) # 6
 
 
