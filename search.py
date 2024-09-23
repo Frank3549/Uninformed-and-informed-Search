@@ -453,26 +453,6 @@ if __name__ == "__main__":
     else:
         print("Iterations:", args.iter, "Solutions: 0")
 
-board1 = Node([1, 2, 3, 4, 5, 6, 7, 8, 0])
-board2 = Node([1, 2, 3, 4, 5, 6, 7, 0, 8])
-board3 = Node([1, 2, 3, 4, 5, 6, 7, 8, 0])
-board4 = Node([1, 8, 3, 7, 5, 6, 4, 2, 0])
 
-# Test cases
-print("board1:")
-board1.print_board()
-print("manhattan distance for board1: %d" % manhattan_distance(board1)) # 0
-print("")
-print("board2:")
-board2.print_board()
-print("manhattan distance for board2: %d" % manhattan_distance(board2)) # 1
-print("")
-print("board3:")
-board3.print_board()
-print("manhattan distance for board3: %d" % manhattan_distance(board3)) # 4
-print("")
-print("board4:")
-board4.print_board()
-print("manhattan distance for board4: %d" % manhattan_distance(board4)) # 6
 
 
