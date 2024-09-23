@@ -331,7 +331,6 @@ def manhattan_distance(node: Node) -> int:
     
     """
     
-
     number_of_previous_moves = node.cost
     straight_line_distance = 0
 
