@@ -8,8 +8,9 @@ Brief description of my heuristic:
 TODO Briefly describe your heuristic and why it is more efficient
 """
 
-import argparse, itertools, random, sys
+import argparse, itertools, random, sys, heapq
 from typing import Callable, List, Optional, Sequence, Tuple, Set
+
 
 
 # You are welcome to add constants, but do not modify the pre-existing constants
@@ -33,7 +34,7 @@ def inversions(board: Sequence[int]) -> int:
 
 
 class Node:
-    def __init__(self, state: Sequence[int], parent: "Node" = None, cost=0):
+    def __init__(self, state: Sequence[int], parent: "Node" = None, cost=0, heuristic=0):
         """Create Node to track particular state and associated parent and cost
 
         State is tracked as a "row-wise" sequence, i.e., the board (with _ as the blank)
@@ -50,6 +51,7 @@ class Node:
         self.state = tuple(state)  # To facilitate "hashable" make state immutable
         self.parent = parent
         self.cost = cost
+        self.heuristic = heuristic
 
     def is_goal(self) -> bool:
         """Return True if Node has goal state"""
@@ -368,7 +370,44 @@ def astar(
     # TODO: Implement A* search. Make sure that your code uses the heuristic function provided as
     # an argument so that the test code can switch in your custom heuristic (i.e., do not "hard code"
     # manhattan distance as the heuristic)
-    return None, sys.maxsize
+
+    initial_board = Node(initial_board)
+    unique_nodes_reached = 0 #does not include the initial_state
+    reached: Set["Node"] = set()
+    
+    #min_heap is storing tuples of (heuristic, Node)
+    min_heap: List[Tuple[int, "Node"]] = []
+    
+    if initial_board.is_goal() or BOARD_SIZE <= 1:
+        return initial_board, unique_nodes_reached
+    else: 
+        reached.add(initial_board.state)
+        for move in initial_board.expand():
+            move.heuristic = heuristic(move)
+            heapq.heappush(min_heap, (move.heuristic, move))
+
+    while min_heap and min_heap[0][1].cost <= max_depth:
+        current_node = heapq.heappop(min_heap)[1]
+        unique_nodes_reached += 1
+    
+        if current_node.is_goal():
+            return current_node, unique_nodes_reached
+        
+        else:
+            next_moves = current_node.expand()
+            for move in next_moves:
+                if move.state not in reached or (move.state in reached and move.cost < reached.get(move.state).cost): 
+                    move.heuristic = heuristic(move)
+                    heapq.heappush(min_heap, (move.heuristic, move))
+                    reached.add(move.state) 
+            
+
+    
+
+    return None, unique_nodes_reached
+
+
+
 
 if __name__ == "__main__":
 
