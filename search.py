@@ -344,7 +344,6 @@ def manhattan_distance(node: Node) -> int:
             goal_col = GOAL.index(node.state[square]) % BOARD_SIZE
             straight_line_distance += abs(row - goal_row) + abs(col - goal_col)
 
-    print("previous moves: %d, straight line distance to correct board: %s" % (number_of_previous_moves, straight_line_distance))
     return number_of_previous_moves + straight_line_distance
 
 def custom_heuristic(node: Node) -> int:
@@ -373,7 +372,7 @@ def astar(
 
     initial_board = Node(initial_board)
     unique_nodes_reached = 0 #does not include the initial_state
-    reached: Set["Node"] = set()
+    reached = {} #key is the state, value is the node
     
     #min_heap is storing tuples of (heuristic, Node)
     min_heap: List[Tuple[int, "Node"]] = []
@@ -381,7 +380,7 @@ def astar(
     if initial_board.is_goal() or BOARD_SIZE <= 1:
         return initial_board, unique_nodes_reached
     else: 
-        reached.add(initial_board.state)
+        reached[initial_board.state] = initial_board
         for move in initial_board.expand():
             move.heuristic = heuristic(move)
             heapq.heappush(min_heap, (move.heuristic, move))
@@ -396,10 +395,10 @@ def astar(
         else:
             next_moves = current_node.expand()
             for move in next_moves:
-                if move.state not in reached or (move.state in reached and move.cost < reached.get(move.state).cost): 
+                if move.state not in reached or (move.state in reached and move.cost < reached[move.state].cost): 
                     move.heuristic = heuristic(move)
                     heapq.heappush(min_heap, (move.heuristic, move))
-                    reached.add(move.state) 
+                    reached[move.state] = move 
             
 
     
