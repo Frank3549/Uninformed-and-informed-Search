@@ -347,8 +347,30 @@ def manhattan_distance(node: Node) -> int:
     return number_of_previous_moves + straight_line_distance
 
 def custom_heuristic(node: Node) -> int:
-    # TODO: Implement and document your _admissable_ heuristic function
-    return 0
+    """
+    Compute manhattan distance with last move heuristics f(node), i.e., g(node) + h(node) 
+    where g(node) is the cost to reach the current node and h(node) is the heuristic value aka cost to reach the goal from the current node
+
+    Args:
+        node (Node): The current node
+    
+    Returns:
+        int: The manhattan distance + last move heuristics "f(n)" of the current node
+    
+    """
+    
+    number_of_previous_moves = node.cost
+    straight_line_distance = 0
+
+    for square in range(0, BOARD_SIZE**2):
+        if node.state[square] != GOAL[square] and node.state[square] != 0: #dont count the straight line distance of the blank space
+            row = square // BOARD_SIZE
+            col = square % BOARD_SIZE
+            goal_row = GOAL.index(node.state[square]) // BOARD_SIZE
+            goal_col = GOAL.index(node.state[square]) % BOARD_SIZE
+            straight_line_distance += abs(row - goal_row) + abs(col - goal_col)
+
+    return number_of_previous_moves + straight_line_distance
 
 
 def astar(
