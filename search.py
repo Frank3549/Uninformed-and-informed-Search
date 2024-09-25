@@ -348,29 +348,34 @@ def manhattan_distance(node: Node) -> int:
 
 def custom_heuristic(node: Node) -> int:
     """
-    Compute manhattan distance with last move heuristics f(node), i.e., g(node) + h(node) 
+    Compute manhattan distance with linear conflict heuristics f(node), i.e., g(node) + h(node) 
     where g(node) is the cost to reach the current node and h(node) is the heuristic value aka cost to reach the goal from the current node
 
+    Note: will only be implementing row version of "linear conflict" 
     Args:
         node (Node): The current node
     
     Returns:
-        int: The manhattan distance + last move heuristics "f(n)" of the current node
+        int: The manhattan distance + linear conflict heuristics "f(n)" of the current node
     
     """
     
     number_of_previous_moves = node.cost
     straight_line_distance = 0
+    linear_conflict_heuristic = 0
 
     for square in range(0, BOARD_SIZE**2):
         if node.state[square] != GOAL[square] and node.state[square] != 0: #dont count the straight line distance of the blank space
             row = square // BOARD_SIZE
             col = square % BOARD_SIZE
+            next_square_row = square+1 // BOARD_SIZE
+            if(row == next_square_row and abs(node.state[square] - node.state[square+1]) == 1):
+                linear_conflict_heuristic += 2 #add two additional moves if the next square is in the same row and the difference is 1
             goal_row = GOAL.index(node.state[square]) // BOARD_SIZE
             goal_col = GOAL.index(node.state[square]) % BOARD_SIZE
             straight_line_distance += abs(row - goal_row) + abs(col - goal_col)
 
-    return number_of_previous_moves + straight_line_distance
+    return number_of_previous_moves + straight_line_distance + linear_conflict_heuristic
 
 
 def astar(
