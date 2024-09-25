@@ -369,8 +369,11 @@ def custom_heuristic(node: Node) -> int:
             row = square // BOARD_SIZE
             col = square % BOARD_SIZE
             next_square_row = square+1 // BOARD_SIZE
+            next_square_col = square+1 % BOARD_SIZE
             if(row == next_square_row and abs(node.state[square] - node.state[square+1]) == 1):
                 linear_conflict_heuristic += 2 #add two additional moves if the next square is in the same row and the difference is 1
+            elif(col == next_square_col and abs(node.state[square] - node.state[square+1]) == 1):
+                linear_conflict_heuristic += 2
             goal_row = GOAL.index(node.state[square]) // BOARD_SIZE
             goal_col = GOAL.index(node.state[square]) % BOARD_SIZE
             straight_line_distance += abs(row - goal_row) + abs(col - goal_col)
