@@ -232,23 +232,17 @@ def bfs(initial_board: Sequence[int], max_depth=12) -> Tuple[Optional[Node], int
     """
 
     initial_board = Node(initial_board)
-    unique_nodes_reached = 0 #does not include the initial_state
+    unique_nodes_reached = 0
     considered_states: Set[Tuple[int, ...]] = set()
     queue: List["Node"] = []
-    current_depth = 0
+    considered_states.add(initial_board.state)
+    queue.append(initial_board)
     
     if initial_board.is_goal() or BOARD_SIZE <= 1:
         return initial_board, unique_nodes_reached
-    else: 
-        considered_states.add(initial_board.state)
-        for move in initial_board.expand():
-            queue.append(move)
-        current_depth += 1
-
 
     while queue:
         current_node = queue.pop(0)
-        unique_nodes_reached = len(considered_states)
 
         if current_node.cost > max_depth:
             return None, unique_nodes_reached
@@ -262,12 +256,9 @@ def bfs(initial_board: Sequence[int], max_depth=12) -> Tuple[Optional[Node], int
                 if move.state not in considered_states:
                     queue.append(move)
                     considered_states.add(move.state)
+                    unique_nodes_reached = len(considered_states)
             
-
-            
-
-
-    return None, 0
+    return None, unique_nodes_reached
 
 
 def is_edge_blank(blank_index: int) -> Tuple[bool, str]:
@@ -400,24 +391,22 @@ def astar(
     # an argument so that the test code can switch in your custom heuristic (i.e., do not "hard code"
     # manhattan distance as the heuristic)
 
+
+    
+    min_heap: List[Tuple[int, "Node"]] = [] #min_heap is storing tuples of (heuristic, Node)
     initial_board = Node(initial_board)
-    unique_nodes_reached = 0 #does not include the initial_state
-    reached = {} #key is the state, value is the node
+    unique_nodes_reached = 0
+    reached = {} #key is the state, value is the node  
+    reached[initial_board.state] = initial_board
+    heapq.heappush(min_heap, (heuristic(initial_board), initial_board))
     
-    #min_heap is storing tuples of (heuristic, Node)
-    min_heap: List[Tuple[int, "Node"]] = []
-    
+
     if initial_board.is_goal() or BOARD_SIZE <= 1:
         return initial_board, unique_nodes_reached
-    else: 
-        reached[initial_board.state] = initial_board
-        for move in initial_board.expand():
-            move.heuristic = heuristic(move)
-            heapq.heappush(min_heap, (move.heuristic, move))
 
     while min_heap and min_heap[0][1].cost <= max_depth:
         current_node = heapq.heappop(min_heap)[1]
-        unique_nodes_reached += 1
+        unique_nodes_reached = len(reached)
     
         if current_node.is_goal():
             return current_node, unique_nodes_reached
@@ -425,17 +414,12 @@ def astar(
         else:
             next_moves = current_node.expand()
             for move in next_moves:
-                if move.state not in reached or (move.state in reached and move.cost < reached[move.state].cost): 
+                if (move.state not in reached) or (move.cost < reached[move.state].cost): 
                     move.heuristic = heuristic(move)
                     heapq.heappush(min_heap, (move.heuristic, move))
                     reached[move.state] = move 
             
-
-    
-
     return None, unique_nodes_reached
-
-
 
 
 if __name__ == "__main__":
