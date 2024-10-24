@@ -248,7 +248,7 @@ def bfs(initial_board: Sequence[int], max_depth=12) -> Tuple[Optional[Node], int
 
     while queue:
         current_node = queue.pop(0)
-        unique_nodes_reached += 1
+        unique_nodes_reached = len(considered_states)
 
         if current_node.cost > max_depth:
             return None, unique_nodes_reached
