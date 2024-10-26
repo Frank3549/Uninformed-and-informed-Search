@@ -351,25 +351,25 @@ def custom_heuristic(node: Node) -> int:
     
     """
     
-    number_of_previous_moves = node.cost
-    straight_line_distance = 0
     linear_conflict_heuristic = 0
 
-    for square in range(0, BOARD_SIZE**2):
-        if node.state[square] != GOAL[square] and node.state[square] != 0: #dont count the straight line distance of the blank space
-            row = square // BOARD_SIZE
-            col = square % BOARD_SIZE
-            next_square_row = square+1 // BOARD_SIZE
-            next_col = (square + BOARD_SIZE) if (square + BOARD_SIZE) % BOARD_SIZE < BOARD_SIZE - 1  and square + BOARD_SIZE < BOARD_SIZE**2 else False
-            if(row == next_square_row and abs(node.state[square] - node.state[square+1]) == 1):
-                linear_conflict_heuristic += 2 #add two additional moves if the next square is in the same row and the difference is 1
-            elif(next_col and abs(node.state[square] - node.state[next_col]) == 1):
-                linear_conflict_heuristic += 2
-            goal_row = GOAL.index(node.state[square]) // BOARD_SIZE
-            goal_col = GOAL.index(node.state[square]) % BOARD_SIZE
-            straight_line_distance += abs(row - goal_row) + abs(col - goal_col)
+    # For each row, check for linear conflicts
+    for row in range(BOARD_SIZE):
+        max_goal_column = -1  # Track the furthest goal column in the row
+        for column in range(BOARD_SIZE):
+            square = row * BOARD_SIZE + column
+            tile_value = node.state[square]
+            
+            # Skip blank tiles and tiles not in their goal row
+            if tile_value == 0 or (tile_value - 1) // BOARD_SIZE != row:
+                continue
 
-    return number_of_previous_moves + straight_line_distance + linear_conflict_heuristic
+            goal_column = (tile_value - 1) % BOARD_SIZE
+            if goal_column < max_goal_column:
+                linear_conflict_heuristic += 2  # Add two moves for each linear conflict
+            max_goal_column = max(max_goal_column, goal_column)
+
+    return manhattan_distance(node) + linear_conflict_heuristic
 
 
 def astar(
